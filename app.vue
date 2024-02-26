@@ -1,5 +1,25 @@
 <template>
   <div>
-    <h1 class="text-center text-6xl">Vue.js</h1>
+    <h1>Vue 3 + Vite</h1>
+    <Button label="AAAAAA" />
+    <Steps: model="items" />
   </div>
 </template>
+
+<script setup>
+import { ref } from "vue";
+import Steps from 'primevue/steps';
+
+
+const items = ref([
+    {
+        label: 'Personal Info'
+    },
+    {
+        label: 'Reservation'
+    },
+    {
+        label: 'Review'
+    }
+]);
+</script>
