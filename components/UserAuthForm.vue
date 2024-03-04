@@ -17,8 +17,7 @@ import {
   FormItem,
   FormLabel,
 } from '@/components/ui/form';
-import { useToast } from '@/components/ui/toast/use-toast';
-const { toast } = useToast();
+import { toast } from '@/components/ui/toast'
 
 const formSchema = toTypedSchema(z.object({
   email: z.string().email(),
@@ -39,24 +38,27 @@ const onSubmit = handleSubmit((values) => {
 <template>
   <div :class="cn('grid gap-6', $attrs.class ?? '')">
     <form @submit="onSubmit">
-      <div class="grid gap-2">
-        <div class="grid gap-1">
-          <Label class="sr-only" for="email">
-            Email
-          </Label>
-          <Input
-              id="email"
-              placeholder="name@example.com"
-              type="email"
-              auto-capitalize="none"
-              auto-complete="email"
-              auto-correct="off"
-          />
+      <FormField v-slot="{ componentField }" name="email">
+        <div class="grid gap-2">
+          <div class="grid gap-1">
+            <Label class="sr-only" for="email">
+              Email
+            </Label>
+            <Input
+                id="email"
+                placeholder="name@example.com"
+                type="email"
+                auto-capitalize="none"
+                auto-complete="email"
+                auto-correct="off"
+                v-bind="componentField"
+            />
+          </div>
+          <Button type="submit">
+            Sign In with Email
+          </Button>
         </div>
-        <Button>
-          Sign In with Email
-        </Button>
-      </div>
+      </FormField>
     </form>
     <div class="relative">
       <div class="absolute inset-0 flex items-center">
