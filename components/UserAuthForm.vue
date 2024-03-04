@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { h } from 'vue';
+//import { h } from 'vue';
 import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import * as z from 'zod'
@@ -17,21 +17,18 @@ import {
   FormItem,
   FormLabel,
 } from '@/components/ui/form';
-import { toast } from '@/components/ui/toast'
-
-const formSchema = toTypedSchema(z.object({
-  email: z.string().email(),
-}));
+import { showToast } from "~/utils/show-toast";
 
 const { handleSubmit } = useForm({
   validationSchema: formSchema,
 });
 
 const onSubmit = handleSubmit((values) => {
-  toast({
-    title: 'You submitted the following values:',
-    description: h('pre', { class: 'mt-2 w-[340px] rounded-md bg-slate-950 p-4' }, h('code', { class: 'text-white' }, JSON.stringify(values, null, 2))),
-  })
+  showToast(
+      'success',
+      'Email Submitted Successfully',
+      'Thank you for signing in!'
+  )
 })
 </script>
 
