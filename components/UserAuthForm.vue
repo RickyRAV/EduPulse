@@ -19,6 +19,10 @@ import {
 } from '@/components/ui/form';
 import { showToast } from "~/utils/show-toast";
 
+const formSchema = toTypedSchema(z.object({
+  email: z.string().email(),
+}));
+
 const { handleSubmit } = useForm({
   validationSchema: formSchema,
 });
