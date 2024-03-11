@@ -21,15 +21,15 @@
       <div class="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
         <div class="flex flex-col space-y-2 text-center">
           <h1 class="text-2xl font-semibold tracking-tight">
-            Create an account
+            Sign Up for Launch
           </h1>
           <p class="text-sm text-muted-foreground">
-            Enter your email below to create your account
+            Enter your email below to sign up for the launch
           </p>
         </div>
         <UserAuthForm />
         <p class="px-8 text-center text-sm text-muted-foreground">
-          By clicking Sign In, you agree to selling your soul.
+          By clicking Sign Up, you agree to selling your soul.
         </p>
       </div>
     </div>

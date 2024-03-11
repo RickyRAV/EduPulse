@@ -1,39 +1,42 @@
 <script setup lang="ts">
 //import { h } from 'vue';
-import { useForm } from 'vee-validate'
-import { toTypedSchema } from '@vee-validate/zod'
+import {useForm} from 'vee-validate'
+import {toTypedSchema} from '@vee-validate/zod'
 import * as z from 'zod'
-
-import { Loader2 } from 'lucide-vue-next';
-import { GithubLogoIcon } from '@radix-icons/vue';
-import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import {
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-} from '@/components/ui/form';
-import { showToast } from "~/utils/show-toast";
+import {cn} from '@/lib/utils';
+import {Button} from '@/components/ui/button';
+import {Input} from '@/components/ui/input';
+import {Label} from '@/components/ui/label';
+import {FormField,} from '@/components/ui/form';
+import {showToast} from "~/utils/show-toast";
+import { Resend } from 'resend';
 
 const formSchema = toTypedSchema(z.object({
   email: z.string().email(),
 }));
 
-const { handleSubmit } = useForm({
+const { handleSubmit, resetForm } = useForm({
   validationSchema: formSchema,
 });
+
+const resend = new Resend('RESEND_API_KEY');
+const createContact = async(mail: string) => {
+  await resend.contacts.create({
+    email: mail,
+    unsubscribed: false,
+    audienceId: 'RESEND_AUDIENCE_ID'
+  })
+}
 
 const onSubmit = handleSubmit((values) => {
   showToast(
       'success',
       'Email Submitted Successfully',
-      'Thank you for signing in!'
+      'Thank you for signing up!'
   )
-})
+  resetForm();
+  //createContact(values.email);
+});
 </script>
 
 <template>
@@ -56,25 +59,25 @@ const onSubmit = handleSubmit((values) => {
             />
           </div>
           <Button type="submit">
-            Sign In with Email
+            Sign Up with Email
           </Button>
         </div>
       </FormField>
     </form>
-    <div class="relative">
-      <div class="absolute inset-0 flex items-center">
-        <span class="w-full border-t" />
-      </div>
-      <div class="relative flex justify-center text-xs uppercase">
-        <span class="bg-background px-2 text-muted-foreground">
-          Or continue with
-        </span>
-      </div>
-    </div>
-    <Button variant="outline" type="button">
-      <GithubLogoIcon class="mr-2 h-4 w-4" />
-      GitHub
-    </Button>
+<!--    <div class="relative">-->
+<!--      <div class="absolute inset-0 flex items-center">-->
+<!--        <span class="w-full border-t" />-->
+<!--      </div>-->
+<!--      <div class="relative flex justify-center text-xs uppercase">-->
+<!--        <span class="bg-background px-2 text-muted-foreground">-->
+<!--          Or continue with-->
+<!--        </span>-->
+<!--      </div>-->
+<!--    </div>-->
+<!--    <Button variant="outline" type="button">-->
+<!--      <GithubLogoIcon class="mr-2 h-4 w-4" />-->
+<!--      GitHub-->
+<!--    </Button>-->
   </div>
 </template>
 
