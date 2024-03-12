@@ -9,7 +9,7 @@
       <div class="relative z-20 mt-auto">
         <blockquote class="space-y-2">
           <p class="text-lg">
-            &ldquo;Making an UI for OLLAMA is not enough as a project&rdquo;
+            &ldquo;Making an UI for OLLAMA is not enough&rdquo;
           </p>
           <footer class="text-sm">
             Robert Baumgartner

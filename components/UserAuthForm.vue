@@ -8,8 +8,11 @@ import {Button} from '@/components/ui/button';
 import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
 import {FormField,} from '@/components/ui/form';
-import {showToast} from "~/utils/show-toast";
-import { Resend } from 'resend';
+
+interface SubscribeResponse {
+  status: 'ok' | 'error';
+  message: string;
+}
 
 const formSchema = toTypedSchema(z.object({
   email: z.string().email(),
@@ -19,23 +22,30 @@ const { handleSubmit, resetForm } = useForm({
   validationSchema: formSchema,
 });
 
-const resend = new Resend('RESEND_API_KEY');
-const createContact = async(mail: string) => {
-  await resend.contacts.create({
-    email: mail,
-    unsubscribed: false,
-    audienceId: 'RESEND_AUDIENCE_ID'
-  })
-}
+const email = async (value: string): Promise<SubscribeResponse> => {
+  return await $fetch<SubscribeResponse>('/api/subscribe', {
+    method: 'POST',
+    body: JSON.stringify({ email: value }),
+  });
+};
 
-const onSubmit = handleSubmit((values) => {
-  showToast(
-      'success',
-      'Email Submitted Successfully',
-      'Thank you for signing up!'
-  )
+const onSubmit = handleSubmit(async (values) => {
+  const response = await email(values.email);
+
+  if (response.status === 'ok') {
+    showToast(
+        'success',
+        'Email Submitted Successfully',
+        'Thank you for signing up!'
+    );
+  } else {
+    showToast(
+        'destructive',
+        'Email Submission Failed',
+        response.message
+    );
+  }
   resetForm();
-  //createContact(values.email);
 });
 </script>
 
