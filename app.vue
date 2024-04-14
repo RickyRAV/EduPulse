@@ -63,6 +63,9 @@ useSeoMeta({
     index: true,
     follow: true,
     noarchive: true,
+    maxVideoPreview: -1,
+    maxImagePreview: 'large',
+    maxSnippet: -1,
   },
 })
 </script>
