@@ -1,5 +1,6 @@
 <template>
   <div>
+    <!-- Markup shared across all pages, ex: NavBar -->
     <NuxtPage />
   </div>
 </template>
@@ -8,7 +9,7 @@
 
 // DRY Don't Repeat Yourself
 useSeoMeta({
-  title: 'EduPulse',
+  titleTemplate: 'EduPulse %separator %s',
   description: 'EduPulse is a revolutionary platform designed to manage and balance academic workload between teachers and pupils. It helps in monitoring student workload, offering insights into their efforts and study time, thereby promoting a healthier educational environment.',
 
   ogUrl: 'www.edupulse.rickyraveanu.com',

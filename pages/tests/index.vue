@@ -4,3 +4,9 @@
     Page content
   </div>
 </template>
+
+<script lang="ts" setup>
+useSeoMeta({
+  title: "Test Page",
+})
+</script>
