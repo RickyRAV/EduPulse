@@ -43,6 +43,7 @@ import UserAuthForm from './components/UserAuthForm.vue';
 import Toaster from '@/components/ui/toast/Toaster.vue'
 import {School} from 'lucide-vue-next';
 
+// DRY Don't Repeat Yourself
 useSeoMeta({
   title: 'EduPulse',
   description: 'EduPulse is a revolutionary platform designed to manage and balance academic workload between teachers and pupils. It helps in monitoring student workload, offering insights into their efforts and study time, thereby promoting a healthier educational environment.',
