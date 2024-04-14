@@ -59,7 +59,7 @@ useSeoMeta({
     return 'EduPulse';
   },
   ogImage() {
-    return 'https://www.edupulse.rickyraveanu.com/edupulse_og.png';
+    return 'https://edupulse.rickyraveanu.com/edupulse_og.png';
   },
   ogLocale() {
     return 'en_US';
