@@ -23,7 +23,7 @@ const { handleSubmit, resetForm } = useForm({
 });
 
 const email = async (value: string): Promise<SubscribeResponse> => {
-  return await $fetch<SubscribeResponse>('/api/subscribe', {
+  return await $fetch<SubscribeResponse>('/api/v1/subscribe', {
     method: 'POST',
     body: JSON.stringify({ email: value }),
   });
