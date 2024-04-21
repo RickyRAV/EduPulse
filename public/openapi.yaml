@@ -1,0 +1,407 @@
+openapi: '3.0.0'
+info:
+  version: '0.0.1'
+  title: 'EduPulse API'
+  description: 'Google Classroom but worse, not completely done YET'
+servers:
+  - url: 'https://edupulse.rickyraveanu.com/api/v1'
+  - url: 'http://localhost:3000/api/v1'
+tags:
+  - name: 'General'
+    description: 'Either Welcome message or stuff like that'
+  - name: 'User'
+    description: 'Operations only for BE-Developing'
+  - name: 'Teachers'
+    description: 'Operations for handling teachers'
+  - name: 'Students'
+    description: 'Operations for handling students'
+  - name: 'Courses'
+    description: 'General for existing Classes'
+  - name: 'Assignments'
+    description: 'Operations for managing assignments'
+  - name: 'Specializations'
+    description: 'Operations for handling specializations'
+
+paths:
+  /welcome:
+    get:
+      tags: ['General']
+      summary: 'Retrieve Welcome Message'
+      responses:
+        '200':
+          description: 'Success'
+          content:
+            application/json:
+              example: 'Welcome to the EduPulse API! For Documentation, visit: https://edupulse.rickyraveanu.com/api/v1/welcome'
+  /login:
+    post:
+      tags: [ User ]
+      summary: User Sign-in
+      operationId: loginUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  description: Existing user's email
+                password:
+                  type: string
+                  description: Existing user's password
+              required:
+                - email
+                - password
+              example:
+                email: newUser@user.com
+                password: newPassword
+      responses:
+        '200':
+          description: User signed in successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  userID:
+                    type: string
+                  email:
+                    type: string
+  /join-specializations:
+    post:
+      tags: ['Teachers']
+      summary: 'Teachers get specializations'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  teacherID: 
+                    type: string
+                  specializationsID:
+                    type: array
+                    items:
+                      type: string
+  /courses_teachers:
+    post:
+      tags: ['Teachers']
+      summary: 'Teachers create courses'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Courses_teachers'
+  /specializations:
+    get:
+      tags: ['Specializations']
+      summary: 'Retrieve Teachers Specializations'
+      parameters:
+        - name: 'limit'
+          in: 'query'
+          required: true
+          schema:
+            type: 'integer'
+            default: 10
+        - name: 'offset'
+          in: 'query'
+          required: true
+          schema:
+            type: 'integer'
+            default: 0
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Specialization'
+                  totalCount:
+                    type: integer
+  /assignClass:
+    post:
+      tags: ['Students']
+      summary: 'Students Join Classes'
+      responses:
+        '200':
+          description: Success
+                  
+  /classes:
+    get:
+      tags: ['Classes']
+      summary: 'Retrieve all classes'
+      parameters:
+        - name: 'limit'
+          in: 'query'
+          required: true
+          schema:
+            type: 'integer'
+            default: 10
+        - name: 'offset'
+          in: 'query'
+          required: true
+          schema:
+            type: 'integer'
+            default: 0
+      responses:
+        '200':
+          description: 'List of all classes'
+          content:
+            application/json:
+              schema:
+                type: 'array'
+                items:
+                  $ref: '#/components/schemas/Class'
+
+  /courses:
+    get:
+      tags: ['Courses']
+      summary: 'Retrieve all courses'
+      parameters:
+        - name: 'limit'
+          in: 'query'
+          required: true
+          schema:
+            type: 'integer'
+            default: 10
+        - name: 'offset'
+          in: 'query'
+          required: true
+          schema:
+            type: 'integer'
+            default: 0
+      responses:
+        '200':
+          description: 'List of courses'
+          content:
+            application/json:
+              schema:
+                type: 'array'
+                items:
+                  $ref: '#/components/schemas/Course'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+    post:
+      tags: ['Courses']
+      summary: 'Post a course'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                class_id:
+                  type: string
+      responses:
+        '200':
+          description: Add a new course connected to a class
+          content:
+            application/json:
+              schema: 
+                type: object
+                properties: 
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Course'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /courses/{course_id}:
+    delete:
+      tags: ['Courses']
+      summary: 'Delete a course'
+      parameters:
+        - name: 'course_id'
+          in: 'path'
+          required: true
+          schema:
+            type: 'string'
+      responses:
+        '200':
+          description: 'Course deleted successfully'
+          content:
+            application/json:
+              schema: 
+                type: object
+                properties: 
+                  message:
+                    type: string
+                    example: 'Course deleted successfully.'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+  /assignments:
+    get:
+      tags: ['Assignments']
+      summary: 'Retrieve all Class Assignments'
+      responses:
+        '200':
+          description: 'Success'
+          content:
+            application/json:
+              schema:
+                type: 'array'
+                items:
+                  $ref: '#/components/schemas/Assignment'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+    post:
+      tags: ['Assignments']
+      summary: 'Post an assignment for the students'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                courseID: 
+                  type: 'string'
+                title:
+                  type: 'string'
+                description:
+                  type: 'string'
+                difficulty:
+                  type: 'integer'
+                max_hours:
+                  type: 'integer'
+      responses:
+        '200':
+          description: 'Assignment created successfully'
+          content:
+            application/json:
+              schema:
+                type: 'object'
+                properties:
+                  id:
+                    type: 'string'
+                  message:
+                    type: 'string'
+                    example: 'Assignment created successfully.'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /assignments/{assignment_id}:
+    delete:
+      tags: ['Assignments']
+      summary: 'Delete an assignment'
+      parameters:
+        - name: 'assignment_id'
+          in: 'path'
+          required: true
+          schema:
+            type: 'string'
+      responses:
+        '200':
+          description: 'Assignment deleted successfully'
+          content:
+            application/json:
+              schema:
+                type: 'object'
+                properties:
+                  message:
+                    type: 'string'
+                    example: 'Assignment deleted successfully.'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+          
+  /assignments_completions:
+    post:
+      tags: ['Assignments']
+      summary: 'Post performance as a student'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+             $ref: '#/components/schemas/Assignment_completion'
+      responses:
+        '200':
+          description: 'Performance posted successfully.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Assignment_completion'
+components:
+  responses:
+      BadRequest:
+        description: 'Bad request due to invalid input provided.'
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                error:
+                  type: string
+                  example: 'Invalid input parameters.'
+  schemas:
+    Specialization:
+        type: 'object'
+        properties:
+          id: 
+            type: 'string'
+          name:
+            type: 'string'
+    Class:
+        type: 'object'
+        properties:
+          name: 
+            type: 'string'
+          year:
+            type: 'string'
+    Assignment_completion:
+      type: 'object'
+      properties:
+        difficulty_reported:
+          type: 'integer'
+        time_spent:
+          type: 'integer'
+        assignment_id:
+          type: 'string'
+        student_id:
+          type: 'string'
+    Courses_teachers:
+      type: 'object'
+      properties:
+        courses_id:
+          type: 'integer'
+        teachers_id:
+          type: 'integer'
+    Course:
+      type: 'object'
+      properties:
+        id:
+          type: 'string'
+        name:
+          type: 'string'
+        classId:
+          type: 'string'
+    Assignment:
+      type: 'object'
+      properties:
+        id:
+          type: 'string'
+        title:
+          type: 'string'
+        description:
+          type: 'string'
+        difficulty:
+          type: 'integer'
+        max_hours:
+          type: 'integer'
+        course:
+          $ref: '#/components/schemas/Course'
