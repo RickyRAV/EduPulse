@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { onMounted } from 'vue';
-import SwaggerUI from 'swagger-ui-dist/swagger-ui-bundle.js';
+import {onMounted} from 'vue';
+import {SwaggerUIBundle} from 'swagger-ui-dist'
 import 'swagger-ui-dist/swagger-ui.css';
 
 onMounted(() => {
-  SwaggerUI({
+  SwaggerUIBundle({
     dom_id: '#swagger-ui',
     url: '/openapi.yaml'
   });
@@ -12,11 +12,13 @@ onMounted(() => {
 </script>
 
 <template>
-  <div>
-    <div id="swagger-ui"></div>
+  <div id="swagger-ui">
+    <!-- Swagger UI will be mounted here -->
   </div>
 </template>
 
 <style scoped>
-
+* {
+  background: white;
+}
 </style>
