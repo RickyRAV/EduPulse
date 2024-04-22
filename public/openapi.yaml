@@ -32,7 +32,7 @@ paths:
           description: 'Success'
           content:
             application/json:
-              example: 'Welcome to the EduPulse API! For Documentation, visit: https://edupulse.rickyraveanu.com/api/v1/welcome'
+              example: 'Welcome to the EduPulse API! For Documentation, visit: https://edupulse.rickyraveanu.com/api-docs'
   /login:
     post:
       tags: [ User ]
