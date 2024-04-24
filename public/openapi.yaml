@@ -129,7 +129,7 @@ paths:
                       $ref: '#/components/schemas/Specialization'
                   totalCount:
                     type: integer
-  /assignClass:
+  /assign-class:
     post:
       tags: ['Students']
       summary: 'Students Join Classes'
