@@ -74,18 +74,18 @@ const onSubmit = handleSubmit(async (values) => {
         </div>
       </FormField>
     </form>
-<!--    <div class="relative">-->
-<!--      <div class="absolute inset-0 flex items-center">-->
-<!--        <span class="w-full border-t" />-->
+<!--    <div classes="relative">-->
+<!--      <div classes="absolute inset-0 flex items-center">-->
+<!--        <span classes="w-full border-t" />-->
 <!--      </div>-->
-<!--      <div class="relative flex justify-center text-xs uppercase">-->
-<!--        <span class="bg-background px-2 text-muted-foreground">-->
+<!--      <div classes="relative flex justify-center text-xs uppercase">-->
+<!--        <span classes="bg-background px-2 text-muted-foreground">-->
 <!--          Or continue with-->
 <!--        </span>-->
 <!--      </div>-->
 <!--    </div>-->
 <!--    <Button variant="outline" type="button">-->
-<!--      <GithubLogoIcon class="mr-2 h-4 w-4" />-->
+<!--      <GithubLogoIcon classes="mr-2 h-4 w-4" />-->
 <!--      GitHub-->
 <!--    </Button>-->
   </div>

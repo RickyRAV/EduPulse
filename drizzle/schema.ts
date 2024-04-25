@@ -1,4 +1,4 @@
-import { pgTable, unique, pgEnum, uuid, timestamp, varchar, foreignKey, text, smallint, jsonb } from "drizzle-orm/pg-core"
+import { pgTable, unique, pgEnum, uuid, timestamp, varchar, foreignKey, text, smallint, jsonb, primaryKey } from "drizzle-orm/pg-core"
   import { sql } from "drizzle-orm"
 
 export const keyStatus = pgEnum("key_status", ['default', 'valid', 'invalid', 'expired'])
@@ -25,9 +25,13 @@ export const specializations = pgTable("specializations", {
 });
 
 export const teachers = pgTable("teachers", {
-	id: uuid("id").defaultRandom().primaryKey().notNull(),
-	userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade", onUpdate: "cascade" } ),
+	userId: uuid("user_id").primaryKey().notNull().references(() => users.id, { onDelete: "cascade", onUpdate: "cascade" } ),
 	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
+},
+(table) => {
+	return {
+		teachersUserIdKey: unique("teachers_user_id_key").on(table.userId),
+	}
 });
 
 export const userRoles = pgTable("user_roles", {
@@ -60,19 +64,29 @@ export const assignmentsCompletions = pgTable("assignments_completions", {
 	timeSpent: smallint("time_spent").notNull(),
 	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
 	assignmentId: uuid("assignment_id").notNull().references(() => assignments.id, { onDelete: "cascade", onUpdate: "cascade" } ),
-	studentId: uuid("student_id").notNull().references(() => students.id, { onDelete: "cascade", onUpdate: "cascade" } ),
+	studentId: uuid("student_id").notNull().references(() => students.userId, { onDelete: "cascade", onUpdate: "cascade" } ),
 });
 
 export const courses = pgTable("courses", {
 	id: uuid("id").defaultRandom().primaryKey().notNull(),
 	name: varchar("name").notNull(),
 	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
+	classId: uuid("class_id").notNull().references(() => classes.id, { onDelete: "cascade", onUpdate: "cascade" } ),
+},
+(table) => {
+	return {
+		coursesClassIdKey: unique("courses_class_id_key").on(table.classId),
+	}
 });
 
 export const students = pgTable("students", {
-	id: uuid("id").defaultRandom().primaryKey().notNull(),
-	userId: uuid("user_id").defaultRandom().notNull().references(() => users.id, { onDelete: "cascade", onUpdate: "cascade" } ),
+	userId: uuid("user_id").defaultRandom().primaryKey().notNull().references(() => users.id, { onDelete: "cascade", onUpdate: "cascade" } ),
 	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
+},
+(table) => {
+	return {
+		studentsUserIdKey: unique("students_user_id_key").on(table.userId),
+	}
 });
 
 export const users = pgTable("users", {
@@ -94,20 +108,6 @@ export const classes = pgTable("classes", {
 	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
 });
 
-export const specializationsTeachers = pgTable("specializations_teachers", {
-	id: uuid("id").defaultRandom().primaryKey().notNull(),
-	specializations: uuid("specializations").notNull().references(() => specializations.id, { onDelete: "cascade", onUpdate: "cascade" } ),
-	teachers: uuid("teachers").notNull().references(() => teachers.id, { onDelete: "cascade", onUpdate: "cascade" } ),
-	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
-});
-
-export const studentsClasses = pgTable("students_classes", {
-	id: uuid("id").defaultRandom().primaryKey().notNull(),
-	students: uuid("students").notNull().references(() => students.id, { onDelete: "cascade", onUpdate: "cascade" } ),
-	classes: uuid("classes").notNull().references(() => classes.id, { onDelete: "cascade", onUpdate: "cascade" } ),
-	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
-});
-
 export const rolePermissions = pgTable("role_permissions", {
 	id: uuid("id").defaultRandom().primaryKey().notNull(),
 	role: appRole("role").notNull(),
@@ -115,9 +115,35 @@ export const rolePermissions = pgTable("role_permissions", {
 	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
 });
 
-export const coursesTeachers = pgTable("courses_teachers", {
-	id: uuid("id").defaultRandom().primaryKey().notNull(),
-	courses: uuid("courses").notNull().references(() => courses.id, { onDelete: "cascade", onUpdate: "cascade" } ),
-	teachers: uuid("teachers").notNull().references(() => teachers.id, { onDelete: "cascade", onUpdate: "cascade" } ),
+export const specializationsTeachers = pgTable("specializations_teachers", {
+	specializationsId: uuid("specializations_id").notNull().references(() => specializations.id, { onDelete: "cascade", onUpdate: "cascade" } ),
+	teachersId: uuid("teachers_id").notNull().references(() => teachers.userId),
 	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
+},
+(table) => {
+	return {
+		specializationsTeachersPkey: primaryKey({ columns: [table.specializationsId, table.teachersId], name: "specializations_teachers_pkey"})
+	}
+});
+
+export const studentsClasses = pgTable("students_classes", {
+	studentsId: uuid("students_id").notNull().references(() => students.userId, { onDelete: "cascade", onUpdate: "cascade" } ),
+	classesId: uuid("classes_id").notNull().references(() => classes.id, { onDelete: "cascade", onUpdate: "cascade" } ),
+	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
+},
+(table) => {
+	return {
+		studentsClassesPkey: primaryKey({ columns: [table.studentsId, table.classesId], name: "students_classes_pkey"})
+	}
+});
+
+export const coursesTeachers = pgTable("courses_teachers", {
+	coursesId: uuid("courses_id").notNull().references(() => courses.id, { onDelete: "cascade", onUpdate: "cascade" } ),
+	teachersId: uuid("teachers_id").notNull().references(() => teachers.userId, { onDelete: "cascade", onUpdate: "cascade" } ),
+	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
+},
+(table) => {
+	return {
+		coursesTeachersPkey: primaryKey({ columns: [table.coursesId, table.teachersId], name: "courses_teachers_pkey"})
+	}
 });
