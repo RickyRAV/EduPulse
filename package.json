@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "build": "nuxt build",
-    "dev": "nuxt dev",
+    "dev": "nuxt dev --dotenv .env.local",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
@@ -39,7 +39,7 @@
     "@nuxtjs/supabase": "^1.1.6",
     "@nuxtjs/tailwindcss": "^6.11.4",
     "@types/swagger-ui-dist": "^3.30.4",
-    "drizzle-kit": "^0.20.14",
+    "drizzle-kit": "^0.20.17",
     "nuxt-lucide-icons": "^1.0.4",
     "shadcn-nuxt": "^0.9.0",
     "typescript": "^5.3.3"
