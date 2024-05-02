@@ -1,5 +1,5 @@
 import {db} from '../../../utils/db.drizzle';
-import {classes, courses, coursesTeachers} from "~/drizzle/schema";
+import {classes, courses, coursesTeachers, studentsClasses} from "~/drizzle/schema";
 import {count, eq} from 'drizzle-orm';
 import paginationSchema from "~/server/api/schemas/pagination-schema";
 
@@ -16,18 +16,18 @@ export default defineEventHandler(async (event) => {
         const data = await db.select({
             id: courses.id,
             name: courses.name,
-            class_name: classes.name,
-            class_id: classes.id,
         })
-            .from(coursesTeachers)
-            .innerJoin(courses, eq(courses.id, coursesTeachers.coursesId))
-            .innerJoin(classes, eq(courses.classId, classes.id))
-            .where(eq(coursesTeachers.teachersId, user_id))
+            .from(studentsClasses)
+            .innerJoin(classes, eq(studentsClasses.classesId, classes.id))
+            .innerJoin(courses, eq(classes.id, courses.classId))
+            .where(eq(studentsClasses.studentsId, user_id))
             .limit(limit)
             .offset(offset);
         const total_records = await db.select({count: count()})
-            .from(coursesTeachers)
-            .where(eq(coursesTeachers.teachersId, user_id));
+            .from(studentsClasses)
+            .innerJoin(classes, eq(studentsClasses.classesId, classes.id))
+            .innerJoin(courses, eq(classes.id, courses.classId))
+            .where(eq(studentsClasses.studentsId, user_id));
         setResponseStatus(event, 200);
         return {
             data,
