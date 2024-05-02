@@ -24,7 +24,7 @@ export default defineEventHandler(async (event) => {
     try {
         const {id} = router.data;
         const {offset, limit} = query.data;
-        // const {user: {id: user_id}} = event.context.user;
+        const {user: {id: user_id}} = event.context.user;
         const data = await db.select()
             .from(courses)
             .where(eq(courses.classId, id))
@@ -36,10 +36,11 @@ export default defineEventHandler(async (event) => {
         //     .innerJoin(coursesTeachers, eq(courses.id, coursesTeachers.coursesId))
         //     .innerJoin(teachers, eq(coursesTeachers.teachersId, teachers.userId))
         //     .where(eq(courses.classId, id));
+        const total_records = await db.select({ count: count() }).from(courses).where(eq(courses.classId, id));
         setResponseStatus(event, 200);
         return {
             data,
-            // pagination: { total_records: total_records[0].count }
+            pagination: { total_records: total_records[0].count }
         }
     } catch (error) {
         setResponseStatus(event, 500);

@@ -1,6 +1,6 @@
 import {db} from '../../../utils/db.drizzle';
-import {courses} from "~/drizzle/schema";
-import {asc, count} from 'drizzle-orm';
+import {courses, coursesTeachers, teachers} from "~/drizzle/schema";
+import {asc, count, eq} from 'drizzle-orm';
 import paginationSchema from "~/server/api/schemas/pagination-schema";
 
 export default defineEventHandler(async (event) => {
@@ -12,20 +12,23 @@ export default defineEventHandler(async (event) => {
     }
     const {offset, limit} = result.data;
     try {
+        const {user: {id: user_id}} = event.context.user;
         const data = await db.select({
-                id: courses.id,
-                name: courses.name,
-            })
-                .from(courses)
-                .orderBy(asc(courses.name))
-                .limit(limit)
-                .offset(offset);
-        const total_records = await db.select({count: count()}).from(courses);
-
+            id: courses.id,
+            name: courses.name,
+        })
+            .from(coursesTeachers)
+            .innerJoin(courses, eq(courses.id, coursesTeachers.coursesId))
+            .where(eq(coursesTeachers.teachersId, user_id))
+            .limit(limit)
+            .offset(offset);
+        const total_records = await db.select({count: count()})
+            .from(coursesTeachers)
+            .where(eq(coursesTeachers.teachersId, user_id));
         setResponseStatus(event, 200);
         return {
             data,
-            pagination: { total_records: total_records[0].count }
+            pagination: {total_records: total_records[0].count}
         };
     } catch (error) {
         setResponseStatus(event, 500);
