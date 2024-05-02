@@ -1,5 +1,5 @@
 import {db} from '../../../utils/db.drizzle';
-import {assignments, classes, courses} from "~/drizzle/schema";
+import {assignments, courses, coursesTeachers, teachers} from "~/drizzle/schema";
 import paginationSchema from "~/server/api/schemas/pagination-schema";
 import {count, desc, eq} from "drizzle-orm";
 
@@ -12,6 +12,7 @@ export default defineEventHandler(async (event) => {
     }
     const {offset, limit} = result.data;
     try {
+        const {user: {id: user_id}} = event.context.user;
         const data = await db.select({
             id: assignments.id,
             title: assignments.title,
@@ -24,8 +25,12 @@ export default defineEventHandler(async (event) => {
                 class_id: courses.classId,
             }
         })
-            .from(assignments).innerJoin(courses, eq(assignments.courseId, courses.id))
+            .from(assignments)
+            .innerJoin(courses, eq(assignments.courseId, courses.id))
+            .innerJoin(coursesTeachers, eq(courses.id, coursesTeachers.coursesId))
+            .innerJoin(teachers, eq(coursesTeachers.teachersId, teachers.userId))
             .orderBy(desc(assignments.createdAt))
+            .where(eq(teachers.userId, user_id))
             .limit(limit)
             .offset(offset);
         const total_records = await db.select({ count: count() }).from(assignments);

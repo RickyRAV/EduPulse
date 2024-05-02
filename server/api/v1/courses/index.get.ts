@@ -1,6 +1,6 @@
 import {db} from '../../../utils/db.drizzle';
-import {classes, courses, coursesTeachers, teachers} from "~/drizzle/schema";
-import {asc, count, eq} from 'drizzle-orm';
+import {classes, courses, coursesTeachers} from "~/drizzle/schema";
+import {count, eq} from 'drizzle-orm';
 import paginationSchema from "~/server/api/schemas/pagination-schema";
 
 export default defineEventHandler(async (event) => {
