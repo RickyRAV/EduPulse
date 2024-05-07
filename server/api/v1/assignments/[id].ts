@@ -1,6 +1,6 @@
 import {db} from '../../../utils/db.drizzle';
-import {assignments, classes, courses, coursesTeachers, studentsClasses, teachers} from "~/drizzle/schema";
-import {count, desc, eq} from 'drizzle-orm';
+import {assignments, courses} from "~/drizzle/schema";
+import {count, eq} from 'drizzle-orm';
 import paginationSchema from "~/server/api/schemas/pagination-schema";
 import routerParamSchema from "~/server/api/schemas/router-param-schema";
 

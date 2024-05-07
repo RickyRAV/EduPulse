@@ -4,7 +4,7 @@ import {getRequestURL} from "h3";
 export default defineEventHandler(async (event) => {
     const {pathname} = getRequestURL(event)
     // console.log(pathname)
-    const publicRoutes = ['/api/v1/login', '/api/v1/register', '/'];
+    const publicRoutes = ['/api/v1/login', '/api/v1/register', '/', '/signup'];
     if (publicRoutes.includes(pathname)) {
         return;
     }

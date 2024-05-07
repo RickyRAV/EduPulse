@@ -1,5 +1,5 @@
 import {db} from '../../../utils/db.drizzle';
-import {classes, courses, coursesTeachers, studentsClasses} from "~/drizzle/schema";
+import {classes, courses, studentsClasses} from "~/drizzle/schema";
 import {count, eq} from 'drizzle-orm';
 import paginationSchema from "~/server/api/schemas/pagination-schema";
 
