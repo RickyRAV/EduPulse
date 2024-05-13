@@ -1,6 +1,7 @@
 <template>
   <div>
     <!-- Markup shared across all pages, ex: NavBar -->
+    <Toaster />
     <NuxtPage />
   </div>
 </template>
@@ -8,6 +9,8 @@
 <script lang="ts" setup>
 
 // DRY Don't Repeat Yourself
+import {Toaster} from "~/components/ui/toast";
+
 useSeoMeta({
   titleTemplate: 'EduPulse %separator %s',
   description: 'EduPulse is a revolutionary platform designed to manage and balance academic workload between teachers and pupils. It helps in monitoring student workload, offering insights into their efforts and study time, thereby promoting a healthier educational environment.',

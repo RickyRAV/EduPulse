@@ -4,7 +4,11 @@ import {Card, CardContent, CardDescription, CardHeader, CardTitle,} from '@/comp
 import {Input} from '@/components/ui/input'
 import {Label} from '@/components/ui/label'
 import {Tabs, TabsContent, TabsList, TabsTrigger,} from '@/components/ui/tabs'
-import {Github, School, Eye, EyeOff} from 'lucide-vue-next';
+import {Eye, EyeOff, Github, School} from 'lucide-vue-next';
+import {toTypedSchema} from "@vee-validate/zod";
+import {z} from "zod";
+import {useForm} from "vee-validate";
+import {useToast} from '@/components/ui/toast/use-toast'
 
 const isANewUser = ref(false)
 const showPassword = ref(false);
@@ -19,14 +23,35 @@ const togglePasswordVisibility = () => {
 const toggleConfirmPasswordVisibility = () => {
   showConfirmPassword.value = !showConfirmPassword.value;
 }
+
+const {toast} = useToast();
+const formSchema = toTypedSchema(z.object({
+  email: z.string().email(),
+  password: z.string().min(6, {message: 'Password must be at least 6 characters'}),
+  confirmPassword: z.string().optional()
+}));
+const {handleSubmit} = useForm({
+  validationSchema: formSchema,
+});
+const onSubmit = handleSubmit((values) => {
+  console.log('we chilling');
+  console.log(passwordRef)
+  console.log(confirmPasswordRef)
+  toast({
+    title: 'You submitted following values',
+    description: h('pre', {class: 'mt-2 w-[340px] rounded-md bg-slate-950 p-4'}, h('code', {class: 'text-white'}, JSON.stringify(values, null, 2))),
+  })
+});
 </script>
 
 <template>
   <div>
     <Tabs default-value="signup" class="w-auto sm:w-[450px]">
       <TabsList class="grid w-full grid-cols-2 rounded-lg border-none">
-        <TabsTrigger value="signup" class="data-[state=active]:bg-primary data-[state=active]:text-accent">Sign Up</TabsTrigger>
-        <TabsTrigger value="signin" class="data-[state=active]:bg-primary data-[state=active]:text-accent">Sign In</TabsTrigger>
+        <TabsTrigger value="signup" class="data-[state=active]:bg-primary data-[state=active]:text-accent">Sign Up
+        </TabsTrigger>
+        <TabsTrigger value="signin" class="data-[state=active]:bg-primary data-[state=active]:text-accent">Sign In
+        </TabsTrigger>
       </TabsList>
       <TabsContent value="signin">
         <Card class="w-auto rounded-lg p-4 sm:w-[450px]">
@@ -46,42 +71,51 @@ const toggleConfirmPasswordVisibility = () => {
             <div class='border-b-[0.5px] border-white border-opacity-70 pb-1 pt-1'></div>
           </CardHeader>
           <CardContent>
-            <form>
-              <div>
-                <div class="mb-5">
-                  <div class="mb-1.5">
-                    <Label for="email" class="font-thin">Email</Label>
-                  </div>
-                  <Input
-                      type="email"
-                      id="email"
-                      placeholder="Enter your Email Address"
-                      class="border-2 font-medium placeholder:text-white placeholder:opacity-70"
-                      v-model="emailRef"
-                  />
-                </div>
-                <div class="relative mb-5">
-                  <div class="mb-1.5">
-                    <Label for="password" class="font-thin">
+            <form @submit="onSubmit">
+              <FormField class="mb-5" v-slot="{componentField}" name="email">
+                <FormItem>
+                  <FormLabel for="email" class="mb-1.5 font-thin">Email</FormLabel>
+                  <FormControl>
+                    <Input
+                        type="email"
+                        id="email"
+                        placeholder="Enter your Email Address"
+                        class="border-2 font-medium placeholder:text-white placeholder:opacity-70"
+                        v-model="emailRef"
+                        v-bind="componentField"
+                    />
+                  </FormControl>
+                  <FormMessage/>
+                </FormItem>
+              </FormField>
+                <FormField v-slot="{componentField}" name="password">
+                  <FormItem class="relative mb-5">
+                    <FormLabel for="password" class="font-thin mb-1.5">
                       Password
-                    </Label>
-                  </div>
-                  <Input
-                      id="password"
-                      placeholder="Enter your Password"
-                      class="border-2 pr-8 font-medium placeholder:text-white placeholder:opacity-70"
-                      :type="showPassword ? 'text' : 'password'"
-                      v-model="passwordRef"
-                  />
-                  <Button type="button" @click="togglePasswordVisibility" class="absolute bottom-1 right-1 w-7 h-8" size="icon" variant="ghost">
-                    <Eye v-if="showPassword" />
-                    <EyeOff v-else/>
-                    <span class='sr-only'>
-                      Toggle password visibility
-                    </span>
-                  </Button>
-                </div>
-              </div>
+                    </FormLabel>
+                    <div class="relative w-full max-w-sm items-center">
+                      <FormControl>
+                        <Input
+                            id="password"
+                            placeholder="Enter your Password"
+                            class="border-2 pr-8 font-medium placeholder:text-white placeholder:opacity-70"
+                            :type="showPassword ? 'text' : 'password'"
+                            v-model="passwordRef"
+                            v-bind="componentField"
+                        />
+                        <Button type="button" @click="togglePasswordVisibility" class="absolute end-0 inset-y-0 flex items-center justify-center px-2 hover:bg-neutral-500/15"
+                                size="icon" variant="ghost">
+                          <Eye v-if="showPassword"/>
+                          <EyeOff v-else/>
+                          <span class='sr-only'>
+                            Toggle password visibility
+                          </span>
+                        </Button>
+                      </FormControl>
+                    </div>
+                    <FormMessage/>
+                  </FormItem>
+                </FormField>
               <Button type="submit" class="w-full p-5 text-center text-xl font-[550] active:bg-primary/80">
                 Sign In
               </Button>
@@ -107,61 +141,79 @@ const toggleConfirmPasswordVisibility = () => {
             <div class='border-b-[0.5px] border-white border-opacity-70 pb-1 pt-1'></div>
           </CardHeader>
           <CardContent>
-            <form>
-              <div>
-                <div class="mb-5">
-                  <div class="mb-1.5">
-                    <Label for="email" class="font-thin">Email</Label>
+            <form @submit="onSubmit">
+              <FormField class="mb-5" v-slot="{componentField}" name="email">
+                <FormItem>
+                  <FormLabel for="email" class="mb-1.5 font-thin">Email</FormLabel>
+                  <FormControl>
+                    <Input
+                        type="email"
+                        id="email"
+                        placeholder="Enter your Email Address"
+                        class="border-2 font-medium placeholder:text-white placeholder:opacity-70"
+                        v-model="emailRef"
+                        v-bind="componentField"
+                    />
+                  </FormControl>
+                  <FormMessage/>
+                </FormItem>
+              </FormField>
+              <FormField v-slot="{componentField}" name="password">
+                <FormItem class="relative mb-5">
+                  <FormLabel for="password" class="font-thin mb-1.5">
+                    Password
+                  </FormLabel>
+                  <div class="relative w-full max-w-sm items-center">
+                    <FormControl>
+                      <Input
+                          id="password"
+                          placeholder="Enter your Password"
+                          class="border-2 pr-8 font-medium placeholder:text-white placeholder:opacity-70"
+                          :type="showPassword ? 'text' : 'password'"
+                          v-model="passwordRef"
+                          v-bind="componentField"
+                      />
+                      <Button type="button" @click="togglePasswordVisibility" class="absolute end-0 inset-y-0 flex items-center justify-center px-2 hover:bg-neutral-500/15"
+                              size="icon" variant="ghost">
+                        <Eye v-if="showPassword"/>
+                        <EyeOff v-else/>
+                        <span class='sr-only'>
+                            Toggle password visibility
+                          </span>
+                      </Button>
+                    </FormControl>
                   </div>
-                  <Input
-                      type="email"
-                      id="email"
-                      placeholder="Enter your Email Address"
-                      class="border-2 font-medium placeholder:text-white placeholder:opacity-70"/>
-                </div>
-                <div class="relative mb-5">
-                  <div class="mb-1.5">
-                    <Label for="password" class="font-thin">
-                      Password
-                    </Label>
+                  <FormMessage/>
+                </FormItem>
+              </FormField>
+              <FormField v-slot="{componentField}" name="confirmPassword">
+                <FormItem class="relative mb-5">
+                  <FormLabel for="confirmPassword" class="font-thin mb-1.5">
+                    Confirm Password
+                  </FormLabel>
+                  <div class="relative w-full max-w-sm items-center">
+                    <FormControl>
+                      <Input
+                          id="confirmPassword"
+                          placeholder="Confirm your Password"
+                          class="border-2 pr-8 font-medium placeholder:text-white placeholder:opacity-70"
+                          :type="showConfirmPassword ? 'text' : 'password'"
+                          v-model="confirmPasswordRef"
+                          v-bind="componentField"
+                      />
+                      <Button type="button" @click="toggleConfirmPasswordVisibility" class="absolute end-0 inset-y-0 flex items-center justify-center px-2 hover:bg-neutral-500/15"
+                              size="icon" variant="ghost">
+                        <Eye v-if="showConfirmPassword"/>
+                        <EyeOff v-else/>
+                        <span class='sr-only'>
+                            Toggle password visibility
+                          </span>
+                      </Button>
+                    </FormControl>
                   </div>
-                  <Input
-                      id="password"
-                      placeholder="Enter your Password"
-                      class="border-2 pr-8 font-medium placeholder:text-white placeholder:opacity-70"
-                      :type="showPassword ? 'text' : 'password'"
-                      v-model="passwordRef"
-                  />
-                  <Button type="button" @click="togglePasswordVisibility" class="absolute bottom-1 right-1 w-7 h-8" size="icon" variant="ghost">
-                    <Eye v-if="showPassword" />
-                    <EyeOff v-else/>
-                    <span class='sr-only'>
-                      Toggle password visibility
-                    </span>
-                  </Button>
-                </div>
-                <div class="relative mb-5">
-                  <div class="mb-1.5">
-                    <Label for="password" class="font-thin">
-                      Confirm Password
-                    </Label>
-                  </div>
-                  <Input
-                      id="password"
-                      placeholder="Confirm your Password"
-                      class="border-2 pr-8 font-medium placeholder:text-white placeholder:opacity-70"
-                      :type="showConfirmPassword ? 'text' : 'password'"
-                      v-model="confirmPasswordRef"
-                  />
-                  <Button type="button" @click="toggleConfirmPasswordVisibility" class="absolute bottom-1 right-1 w-7 h-8" size="icon" variant="ghost">
-                    <Eye v-if="showConfirmPassword" />
-                    <EyeOff v-else/>
-                    <span class='sr-only'>
-                      Toggle password visibility
-                    </span>
-                  </Button>
-                </div>
-              </div>
+                  <FormMessage/>
+                </FormItem>
+              </FormField>
               <Button type="submit" class="w-full p-5 text-center text-xl font-[550] active:bg-primary/80">
                 Sign Up
               </Button>
