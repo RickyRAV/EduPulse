@@ -18,7 +18,7 @@ export default defineEventHandler(async (event) => {
     if (!token) {
         setResponseStatus(event, 401);
         return {
-            message: 'Unauthorized',
+            message: 'No token provided',
         };
     }
 

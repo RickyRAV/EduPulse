@@ -1,22 +1,24 @@
 <script setup lang="ts">
 import {Button} from '@/components/ui/button'
 import {Card, CardContent, CardDescription, CardHeader, CardTitle,} from '@/components/ui/card'
-import {Input} from '@/components/ui/input'
-import {Label} from '@/components/ui/label'
 import {Tabs, TabsContent, TabsList, TabsTrigger,} from '@/components/ui/tabs'
 import {Eye, EyeOff, Github, School} from 'lucide-vue-next';
 import {toTypedSchema} from "@vee-validate/zod";
 import {z} from "zod";
 import {useForm} from "vee-validate";
 import {useToast} from '@/components/ui/toast/use-toast'
+import { vAutoAnimate } from '@formkit/auto-animate/vue'
 
-const isANewUser = ref(false)
+const supabase = useSupabaseClient();
+
+const isANewUser = ref(false);
 const showPassword = ref(false);
 const showConfirmPassword = ref(false);
 
 const emailRef = ref('');
 const passwordRef = ref('');
 const confirmPasswordRef = ref('');
+
 const togglePasswordVisibility = () => {
   showPassword.value = !showPassword.value;
 }
@@ -27,21 +29,93 @@ const toggleConfirmPasswordVisibility = () => {
 const {toast} = useToast();
 const formSchema = toTypedSchema(z.object({
   email: z.string().email(),
-  password: z.string().min(6, {message: 'Password must be at least 6 characters'}),
+  password: z.string().min(8, {message: 'Password must be at least 8 characters'}),
   confirmPassword: z.string().optional()
 }));
 const {handleSubmit} = useForm({
   validationSchema: formSchema,
 });
-const onSubmit = handleSubmit((values) => {
-  console.log('we chilling');
-  console.log(passwordRef)
-  console.log(confirmPasswordRef)
-  toast({
-    title: 'You submitted following values',
-    description: h('pre', {class: 'mt-2 w-[340px] rounded-md bg-slate-950 p-4'}, h('code', {class: 'text-white'}, JSON.stringify(values, null, 2))),
-  })
+
+const onSubmit = handleSubmit(async (values) => {
+  try {
+    const email = emailRef?.value!;
+    const password = passwordRef?.value!;
+    const confirmPassword = confirmPasswordRef?.value!;
+    if (!email || !password || (isANewUser && !confirmPassword)) {
+      toast({
+        title: 'Please fill out all the fields',
+        variant: 'destructive'
+      });
+      return;
+    }
+    if (isANewUser) {
+      if (password !== confirmPassword) {
+        toast({
+          title: 'Your Passwords do not match',
+          variant: 'destructive'
+        });
+        return;
+      } else {
+        try {
+          try {
+            const {data: {user}, error} = await supabase.auth.signUp({
+              email, password
+            });
+            showToast(
+                'success',
+                'Account Created',
+                'Your account has been created! Please check your inbox for a confirmation email.',
+            );
+            if (error) {
+              toast({
+                title: error.message,
+                variant: 'destructive'
+              });
+            }
+            // refresh router
+            // reloadNuxtApp();
+          } catch (error) {
+            toast({
+              title: error as string,
+              variant: 'destructive'
+            })
+            console.error(error);
+          }
+        } catch (error) {
+          toast({
+            title: 'Error signing up. Please try again.'
+          });
+        }
+      }
+    } else {
+      try {
+        const {data: {user}, error} = await supabase.auth.signInWithPassword({
+          email, password
+        });
+        if (error) {
+          toast({
+            title: error.message,
+            variant: 'destructive'
+          });
+        }
+        reloadNuxtApp();
+      } catch (error) {
+        toast({
+          title: error as string,
+          variant: 'destructive'
+        })
+        console.error(error);
+      }
+    }
+  } catch (error) {
+    alert(error)
+  }
 });
+
+const session = (await supabase.auth.getSession()).data.session;
+if(session) {
+  navigateTo('/')
+}
 </script>
 
 <template>
@@ -71,9 +145,9 @@ const onSubmit = handleSubmit((values) => {
             <div class='border-b-[0.5px] border-white border-opacity-70 pb-1 pt-1'></div>
           </CardHeader>
           <CardContent>
-            <form @submit="onSubmit">
+            <form @submit.prevent="onSubmit">
               <FormField class="mb-5" v-slot="{componentField}" name="email">
-                <FormItem>
+                <FormItem v-auto-animate>
                   <FormLabel for="email" class="mb-1.5 font-thin">Email</FormLabel>
                   <FormControl>
                     <Input
@@ -88,34 +162,35 @@ const onSubmit = handleSubmit((values) => {
                   <FormMessage/>
                 </FormItem>
               </FormField>
-                <FormField v-slot="{componentField}" name="password">
-                  <FormItem class="relative mb-5">
-                    <FormLabel for="password" class="font-thin mb-1.5">
-                      Password
-                    </FormLabel>
-                    <div class="relative w-full max-w-sm items-center">
-                      <FormControl>
-                        <Input
-                            id="password"
-                            placeholder="Enter your Password"
-                            class="border-2 pr-8 font-medium placeholder:text-white placeholder:opacity-70"
-                            :type="showPassword ? 'text' : 'password'"
-                            v-model="passwordRef"
-                            v-bind="componentField"
-                        />
-                        <Button type="button" @click="togglePasswordVisibility" class="absolute end-0 inset-y-0 flex items-center justify-center px-2 hover:bg-neutral-500/15"
-                                size="icon" variant="ghost">
-                          <Eye v-if="showPassword"/>
-                          <EyeOff v-else/>
-                          <span class='sr-only'>
+              <FormField v-slot="{componentField}" name="password">
+                <FormItem class="relative mb-5" v-auto-animate>
+                  <FormLabel for="password" class="font-thin mb-1.5">
+                    Password
+                  </FormLabel>
+                  <div class="relative w-full max-w-sm items-center">
+                    <FormControl>
+                      <Input
+                          id="password"
+                          placeholder="Enter your Password"
+                          class="border-2 pr-8 font-medium placeholder:text-white placeholder:opacity-70"
+                          :type="showPassword ? 'text' : 'password'"
+                          v-model="passwordRef"
+                          v-bind="componentField"
+                      />
+                      <Button type="button" @click="togglePasswordVisibility"
+                              class="absolute end-0 inset-y-0 flex items-center justify-center px-2 hover:bg-neutral-500/15"
+                              size="icon" variant="ghost">
+                        <Eye v-if="showPassword"/>
+                        <EyeOff v-else/>
+                        <span class='sr-only'>
                             Toggle password visibility
                           </span>
-                        </Button>
-                      </FormControl>
-                    </div>
-                    <FormMessage/>
-                  </FormItem>
-                </FormField>
+                      </Button>
+                    </FormControl>
+                  </div>
+                  <FormMessage/>
+                </FormItem>
+              </FormField>
               <Button type="submit" class="w-full p-5 text-center text-xl font-[550] active:bg-primary/80">
                 Sign In
               </Button>
@@ -141,9 +216,9 @@ const onSubmit = handleSubmit((values) => {
             <div class='border-b-[0.5px] border-white border-opacity-70 pb-1 pt-1'></div>
           </CardHeader>
           <CardContent>
-            <form @submit="onSubmit">
+            <form @submit.prevent="onSubmit">
               <FormField class="mb-5" v-slot="{componentField}" name="email">
-                <FormItem>
+                <FormItem v-auto-animate>
                   <FormLabel for="email" class="mb-1.5 font-thin">Email</FormLabel>
                   <FormControl>
                     <Input
@@ -159,7 +234,7 @@ const onSubmit = handleSubmit((values) => {
                 </FormItem>
               </FormField>
               <FormField v-slot="{componentField}" name="password">
-                <FormItem class="relative mb-5">
+                <FormItem class="relative mb-5" v-auto-animate>
                   <FormLabel for="password" class="font-thin mb-1.5">
                     Password
                   </FormLabel>
@@ -173,7 +248,8 @@ const onSubmit = handleSubmit((values) => {
                           v-model="passwordRef"
                           v-bind="componentField"
                       />
-                      <Button type="button" @click="togglePasswordVisibility" class="absolute end-0 inset-y-0 flex items-center justify-center px-2 hover:bg-neutral-500/15"
+                      <Button type="button" @click="togglePasswordVisibility"
+                              class="absolute end-0 inset-y-0 flex items-center justify-center px-2 hover:bg-neutral-500/15"
                               size="icon" variant="ghost">
                         <Eye v-if="showPassword"/>
                         <EyeOff v-else/>
@@ -187,7 +263,7 @@ const onSubmit = handleSubmit((values) => {
                 </FormItem>
               </FormField>
               <FormField v-slot="{componentField}" name="confirmPassword">
-                <FormItem class="relative mb-5">
+                <FormItem class="relative mb-5" v-auto-animate>
                   <FormLabel for="confirmPassword" class="font-thin mb-1.5">
                     Confirm Password
                   </FormLabel>
@@ -201,7 +277,8 @@ const onSubmit = handleSubmit((values) => {
                           v-model="confirmPasswordRef"
                           v-bind="componentField"
                       />
-                      <Button type="button" @click="toggleConfirmPasswordVisibility" class="absolute end-0 inset-y-0 flex items-center justify-center px-2 hover:bg-neutral-500/15"
+                      <Button type="button" @click="toggleConfirmPasswordVisibility"
+                              class="absolute end-0 inset-y-0 flex items-center justify-center px-2 hover:bg-neutral-500/15"
                               size="icon" variant="ghost">
                         <Eye v-if="showConfirmPassword"/>
                         <EyeOff v-else/>

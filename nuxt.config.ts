@@ -1,6 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  modules: ['@nuxtjs/tailwindcss', 'shadcn-nuxt', 'nuxt-lucide-icons'],
+  modules: ['@nuxtjs/tailwindcss', 'shadcn-nuxt', 'nuxt-lucide-icons', '@nuxtjs/supabase'],
   shadcn: {
     /**
      * Prefix for all the imported component
@@ -14,5 +14,8 @@ export default defineNuxtConfig({
   },
   experimental: {
     componentIslands: true,
+  },
+  supabase: {
+    redirect: false
   }
 })

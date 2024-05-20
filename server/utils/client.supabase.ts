@@ -12,7 +12,7 @@ dotenv.config({
 // });
 
 const dbURL = process.env.SUPABASE_URL;
-const annonKEY = process.env.SUPABASE_ANON_KEY;
+const annonKEY = process.env.SUPABASE_KEY;
 const supabase = createClient(dbURL!, annonKEY!);
 
 export default supabase;
