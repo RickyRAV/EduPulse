@@ -1,10 +1,10 @@
-import supabase from "~/server/utils/client.supabase";
+import { serverSupabaseClient } from '#supabase/server'
 import {getRequestURL} from "h3";
 
 export default defineEventHandler(async (event) => {
     const {pathname} = getRequestURL(event)
     // console.log(pathname)
-    const publicRoutes = ['/api/v1/login', '/api/v1/register', '/', '/signup'];
+    const publicRoutes = ['/api/v1/login', '/api/v1/register', '/', '/signup', '/api-docs/', '/teacher'];
     if (publicRoutes.includes(pathname)) {
         return;
     }
@@ -21,7 +21,7 @@ export default defineEventHandler(async (event) => {
             message: 'No token provided',
         };
     }
-
+    const supabase = await serverSupabaseClient(event)
     const { data: user, error } = await supabase.auth.getUser(token);
 
     if (error || !user) {

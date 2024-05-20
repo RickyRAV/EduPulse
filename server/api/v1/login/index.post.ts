@@ -1,5 +1,5 @@
 import loginSchema from "~/server/api/schemas/login-schema";
-import supabase from "~/server/utils/client.supabase";
+import { serverSupabaseClient } from '#supabase/server'
 
 
 export default defineEventHandler(async (event) => {
@@ -13,6 +13,7 @@ export default defineEventHandler(async (event) => {
     }
     const {data: {email, password}} = body;
     try {
+        const supabase = await serverSupabaseClient(event)
         const {data, error} = await supabase.auth.signInWithPassword({
             email, password
         });
