@@ -16,13 +16,15 @@ import {School} from "lucide-vue-next";
 import {toast} from "~/components/ui/toast";
 
 const specializationsStore = useSpecializationsStore();
+
 onMounted(async () => {
   await specializationsStore.fetchSpecializations();
   console.log(specializationsStore.specializations)
 })
+
 const supabase = useSupabaseClient();
 const modelValue = ref<string[]>([])
-const open = ref(false)
+const open = ref(false);
 const searchTerm = ref('')
 
 const filteredSpecializations = computed(() => specializationsStore.specializations.filter((i: {
@@ -91,17 +93,18 @@ const handleContinue = async () => {
                     v-for="specialization in filteredSpecializations" :key="specialization.id"
                     :value="specialization.name"
                     @select.prevent="(ev) => {
-                if (typeof ev.detail.value === 'string') {
-                  searchTerm = ''
-                  modelValue.push(ev.detail.value)
-                }
+                      if (typeof ev.detail.value === 'string') {
+                        searchTerm = ''
+                        modelValue.push(ev.detail.value)
+                      }
 
-                if (filteredSpecializations.length === 0) {
-                  open = false
-                }
-              }"
+                      if (filteredSpecializations.length < 5) {
+                        open = false
+                      }
+                    }"
                 >
                   {{ specialization.name }}
+
                 </CommandItem>
               </CommandGroup>
             </CommandList>
