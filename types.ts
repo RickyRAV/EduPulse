@@ -26,3 +26,4 @@ export interface SpecializationRequestBody {
     teacher:         string;
     specializations: string[];
 }
+
