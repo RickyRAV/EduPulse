@@ -28,13 +28,17 @@ export interface SpecializationRequestBody {
 }
 
 export interface CoursesResponse {
-    data:       Courses[];
+    data:       Class[];
     pagination: Pagination;
 }
 
-export interface Courses {
-    id:    string;
-    name:  string;
-    class: string;
-    year:  string;
+export interface Class {
+    name:           string;
+    year:           string;
+    course_details: CourseDetail[];
+}
+
+export interface CourseDetail {
+    name: string;
+    id:   string;
 }

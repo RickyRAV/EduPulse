@@ -1,6 +1,6 @@
 import {db} from '../../../utils/db.drizzle';
 import {classes, courses, coursesTeachers, studentsClasses} from "~/drizzle/schema";
-import {count, eq} from 'drizzle-orm';
+import {count, eq, sql} from 'drizzle-orm';
 import paginationSchema from "~/server/api/schemas/pagination-schema";
 import { serverSupabaseClient } from '#supabase/server'
 import {jwtDecode, type JwtPayload} from "jwt-decode";
@@ -47,15 +47,17 @@ export default defineEventHandler(async (event) => {
         }
         else if(user_role==='teacher') {
             const data = await db.select({
-                id: courses.id,
-                name: courses.name,
-                class: classes.name,
-                year: classes.year,
-            })
-                .from(coursesTeachers)
-                .innerJoin(courses, eq(courses.id, coursesTeachers.coursesId))
-                .innerJoin(classes, eq(classes.id, courses.classId))
+                name: classes.name,
+                year:classes.year,
+                course_details:
+                    sql`ARRAY_AGG(json_build_object(
+                        'name', courses.name, 
+                        'id', courses.id)) as course_details`})
+                .from(classes)
+                .innerJoin(courses, eq(courses.classId, classes.id))
+                .innerJoin(coursesTeachers, eq(coursesTeachers.coursesId, courses.id))
                 .where(eq(coursesTeachers.teachersId, user_id))
+                .groupBy(classes.name, classes.year)
                 .limit(limit)
                 .offset(offset);
             const total_records = await db.select({count: count()})
