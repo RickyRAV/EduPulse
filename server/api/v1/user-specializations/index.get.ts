@@ -1,12 +1,15 @@
 import {db} from "~/server/utils/db.drizzle";
-import {courses, specializationsTeachers} from "~/drizzle/schema";
-import {z} from "zod";
+import {specializations, specializationsTeachers} from "~/drizzle/schema";
+import {eq} from "drizzle-orm";
 
 export default defineEventHandler(async (event) => {
     try {
         const {user: {id}} = event.context.user;
         setResponseStatus(event, 200);
-        const data = db.select().from(specializationsTeachers);
+        const data = await db.select({name: specializations.name, id: specializations.id})
+            .from(specializationsTeachers)
+            .innerJoin(specializations, eq(specializationsTeachers.specializationsId, specializations.id))
+            .where(eq(specializationsTeachers.teachersId, id))
         return {
             data
         };

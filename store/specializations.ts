@@ -1,22 +1,37 @@
 import { defineStore } from 'pinia';
-import type {ApiResponse, DataItem, SpecializationRequestBody, SpecializationsResponse} from "~/types";
+import type {ApiResponse, SpecializationRequestBody, SpecializationsResponse} from "~/types";
 
 export const useSpecializationsStore = defineStore('specializations', () => {
     const specializations = ref();
+    const userSpecs = ref();
     const token = useCookie('sb-access-token');
     // console.log(token)
-    const fetchSpecializations = async() => {
-        try{
-            const {data} = await $fetch<ApiResponse>('/api/v1/specializations', {
+    const loadSpecializations = async () => {
+        try {
+            // First, fetch user specializations
+            const userResponse = await $fetch<ApiResponse>('/api/v1/user-specializations', {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${token.value}`
                 }
-            })
-            specializations.value = data;
-        } catch(error) {
-            console.error(error)
+            });
+            userSpecs.value = userResponse.data;
+
+            // Fetch all specializations if user has none selected
+            if (userSpecs.value.length === 0) {
+                const allSpecsResponse = await $fetch<ApiResponse>('/api/v1/specializations', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token.value}`
+                    }
+                });
+                specializations.value = allSpecsResponse.data;
+            }
+        } catch (error) {
+            console.error('Failed to load specializations:', error);
+            throw error;
         }
     }
 
@@ -37,5 +52,5 @@ export const useSpecializationsStore = defineStore('specializations', () => {
         }
     }
 
-    return {specializations, token, fetchSpecializations, submitSpecializations};
+    return {specializations, token, userSpecs, submitSpecializations, loadSpecializations};
 });

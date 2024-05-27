@@ -18,9 +18,14 @@ import {toast} from "~/components/ui/toast";
 const specializationsStore = useSpecializationsStore();
 
 onMounted(async () => {
-  await specializationsStore.fetchSpecializations();
-  console.log(specializationsStore.specializations)
-})
+  await specializationsStore.loadSpecializations();
+  if (specializationsStore.userSpecs.length > 0) {
+    navigateTo('/teacher/further-on');
+  } else {
+    navigateTo('/teacher');
+  }
+});
+
 
 const supabase = useSupabaseClient();
 const modelValue = ref<string[]>([])
@@ -38,12 +43,13 @@ const handleContinue = async () => {
       const found = specializationsStore.specializations.find(spec => spec.name === name);
       return found ? found.id : '';
     }).filter(id => id !== '');
-    // Use correct field names expected by the backend
+    // use correct field names expected by the backend
     const body = {
       teacher: user?.id!,  // Backend expects 'teacher', not 'teacherId'
       specializations: specializationIds  // Backend expects 'specializations', not 'specializationIds'
     }
     await specializationsStore.submitSpecializations(body);
+    navigateTo('/teacher/further-on')
   } catch (error) {
     toast({
       title: 'Something went wrong!',

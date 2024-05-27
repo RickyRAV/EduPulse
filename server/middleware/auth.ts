@@ -4,17 +4,17 @@ import {getRequestURL} from "h3";
 export default defineEventHandler(async (event) => {
     const {pathname} = getRequestURL(event)
     // console.log(pathname)
-    const publicRoutes = ['/api/v1/login', '/api/v1/register', '/', '/signup', '/api-docs/', '/teacher'];
+    const publicRoutes = ['/api/v1/login', '/api/v1/register', '/', '/signup', '/api-docs/'];
     if (publicRoutes.includes(pathname)) {
         return;
     }
 
     const headerToken = getHeader(event, 'Authorization')?.split('Bearer ')[1];
 
-    const cookieToken = getCookie(event, 'token');
+    const cookieToken = getCookie(event, 'sb-access-token');
 
     const token = headerToken || cookieToken;
-
+    // console.log(token);
     if (!token) {
         setResponseStatus(event, 401);
         return {

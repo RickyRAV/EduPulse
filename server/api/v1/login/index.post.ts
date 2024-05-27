@@ -24,7 +24,7 @@ export default defineEventHandler(async (event) => {
                 message: error?.message,
             };
         }
-        setCookie(event, 'token', session.access_token, {
+        setCookie(event, 'sb-access-token', session.access_token, {
             maxAge: 3600,
             httpOnly: true,
             secure: true,

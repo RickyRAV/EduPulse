@@ -27,3 +27,14 @@ export interface SpecializationRequestBody {
     specializations: string[];
 }
 
+export interface CoursesResponse {
+    data:       Courses[];
+    pagination: Pagination;
+}
+
+export interface Courses {
+    id:    string;
+    name:  string;
+    class: string;
+    year:  string;
+}
