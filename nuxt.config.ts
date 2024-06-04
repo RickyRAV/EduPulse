@@ -1,6 +1,13 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  modules: ['@nuxtjs/tailwindcss', 'shadcn-nuxt', 'nuxt-lucide-icons', '@nuxtjs/supabase', '@pinia/nuxt'],
+  modules: [
+    '@nuxtjs/tailwindcss',
+    'shadcn-nuxt',
+    'nuxt-lucide-icons',
+    '@nuxtjs/supabase',
+    '@pinia/nuxt',
+    "@nuxt/image"
+  ],
   shadcn: {
     /**
      * Prefix for all the imported component

@@ -20,7 +20,7 @@ const specializationsStore = useSpecializationsStore();
 onMounted(async () => {
   await specializationsStore.loadSpecializations();
   if (specializationsStore.userSpecs.length > 0) {
-    navigateTo('/teacher/further-on');
+    navigateTo('/teacher/courses');
   } else {
     navigateTo('/teacher');
   }
@@ -49,7 +49,7 @@ const handleContinue = async () => {
       specializations: specializationIds  // Backend expects 'specializations', not 'specializationIds'
     }
     await specializationsStore.submitSpecializations(body);
-    navigateTo('/teacher/further-on')
+    navigateTo('/teacher/courses')
   } catch (error) {
     toast({
       title: 'Something went wrong!',

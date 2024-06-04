@@ -20,6 +20,14 @@ export const useCoursesStore = defineStore('courses', () => {
             throw error;
         }
     }
+    const loadCourse = async() => {
+        try{
+            const course = await $fetch<any>('/api/v1/courses')
+        } catch (error) {
+            console.error('Failed to load specializations:', error);
+            throw error;
+        }
+    }
 
     return {course, loadCourses}
 });

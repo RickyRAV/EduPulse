@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {cn} from "~/lib/utils";
 import type {Class} from "~/types";
+import {School} from "lucide-vue-next";
 
 const props = defineProps<{
   courses: Class[]
@@ -9,29 +10,30 @@ const props = defineProps<{
 </script>
 
 <template>
-  <div>
-    <div :class="cn('pb-12', $attrs.class ?? '')" v-if="courses">
+  <nav class="h-screen">
+    <div class="flex items-center mt-4 px-7">
+      <UserAvatar />
+      <span class="ml-2 text-2xl font-semibold">EduPulse</span>
+    </div>
+    <div v-if="courses">
       <div class="space-y-4 py-4">
-        <div class="px-3 py-2" v-for="group in props.courses" :key="group.name">
+        <div class="px-3" v-for="group in props.courses" :key="group.name">
           <h2 class="mb-2 px-4 text-lg font-semibold tracking-tight">
             {{ group.name }} {{ group.year }}
           </h2>
           <div v-for="course in group.course_details" :key="course.id" class="space-y-1">
-            <Button class="w-full justify-start">
+            <Button class="w-full justify-start text-sm" variant="ghost">
               {{ course.name }}
             </Button>
           </div>
         </div>
       </div>
     </div>
-    <div class="flex flex-col space-y-3" v-else>
-      <Skeleton class="h-[125px] w-[250px] rounded-xl"/>
-      <div class="space-y-2">
-        <Skeleton class="h-4 w-[250px]"/>
-        <Skeleton class="h-4 w-[200px]"/>
-      </div>
+    <div class='flex flex-col px-3 py-2' v-else>
+      <Skeleton class='mb-5 flex h-9 w-40 rounded-full' />
+      <Skeleton class='mb-5 flex h-5 w-20 rounded-full' />
     </div>
-  </div>
+  </nav>
 </template>
 
 <style scoped>
