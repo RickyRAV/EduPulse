@@ -2,7 +2,6 @@ import {db} from '../../../utils/db.drizzle';
 import {classes, courses, coursesTeachers, studentsClasses} from "~/drizzle/schema";
 import {count, eq, sql} from 'drizzle-orm';
 import paginationSchema from "~/server/api/schemas/pagination-schema";
-import { serverSupabaseClient } from '#supabase/server'
 import {jwtDecode, type JwtPayload} from "jwt-decode";
 
 interface CustomJwtPayload extends JwtPayload {
@@ -17,10 +16,9 @@ export default defineEventHandler(async (event) => {
         return {status: 'error', message: result.error.issues};
     }
     const {offset, limit} = result.data;
-    const client = await serverSupabaseClient(event)
-    const session = (await client.auth.getSession()).data.session
+    const cookies = parseCookies(event);
     try {
-        const {user_role} = jwtDecode<CustomJwtPayload>(session!.access_token);
+        const {user_role} = jwtDecode<CustomJwtPayload>(cookies?.['sb-access-token']);
         const {user: {id: user_id}} = event.context.user;
         // console.log(event.context.user);
         if(user_role==='student') {

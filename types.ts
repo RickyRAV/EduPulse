@@ -42,3 +42,23 @@ export interface CourseDetail {
     name: string;
     id:   string;
 }
+
+export interface AssignmentsResponse {
+    data:       Assignment[];
+    pagination: Pagination;
+}
+
+export interface Assignment {
+    id:          string;
+    title:       string;
+    description: string;
+    difficulty:  number;
+    max_hours:   number;
+    course:      Course;
+}
+
+export interface Course {
+    id:       string;
+    name:     string;
+    class_id: string;
+}

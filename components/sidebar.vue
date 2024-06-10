@@ -22,9 +22,11 @@ const props = defineProps<{
             {{ group.name }} {{ group.year }}
           </h2>
           <div v-for="course in group.course_details" :key="course.id" class="space-y-1">
-            <Button class="w-full justify-start text-sm" variant="ghost">
-              {{ course.name }}
-            </Button>
+            <NuxtLink :to="`/teacher/courses/${course.id}`">
+              <Button class="w-full justify-start text-sm" variant="ghost">
+                {{ course.name }}
+              </Button>
+            </NuxtLink>
           </div>
         </div>
       </div>

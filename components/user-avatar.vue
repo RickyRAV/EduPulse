@@ -3,7 +3,7 @@ const supabase = useSupabaseClient()
 import {CircleUserRound, LogOut} from 'lucide-vue-next';
 
 const currentUser = useSupabaseUser();
-console.log(currentUser.value)
+// console.log(currentUser.value)
 const handleSignOut = async () => {
   try {
     const {error} = await supabase.auth.signOut();
