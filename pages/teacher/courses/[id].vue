@@ -11,14 +11,30 @@ import {
 
 import {useAssignmentsStore} from "~/store/assignments";
 import {BarChart} from "~/components/ui/chart-bar";
+import {DonutChart} from "~/components/ui/chart-donut";
+import type {Assignment, StudentsPerformance} from "~/types";
 
 const assignmentsStore = useAssignmentsStore();
 const route = useRoute();
 
+type ChartData = Assignment & StudentsPerformance;
+
+let chartData: ChartData[] = [] as ChartData[];
+//did not really question chat gpt about it, just copy pasted it
+let chartCategories: (keyof Assignment | keyof StudentsPerformance)[] = ['avg_student_hours', 'max_hours'] as (keyof Assignment | keyof StudentsPerformance)[];
+//
+
 onMounted(async () => {
-  await assignmentsStore.loadAssignments(route.params.id as string);
+  await assignmentsStore.loadAssignmentsPerformance(route.params.id as string);
+
+  chartData = assignmentsStore.assignment.map((item: Assignment, index: number) => {
+    return {
+      ...item,
+      avg_student_hours: assignmentsStore.studentsPerformance[index]?.avg_student_hours,
+      avg_student_difficulty: assignmentsStore.studentsPerformance[index]?.avg_student_difficulty
+    };
+  });
 });
-console.log(assignmentsStore.assignment);
 </script>
 
 <template>
@@ -65,7 +81,8 @@ console.log(assignmentsStore.assignment);
                 </Table>
               </TabsContent>
               <TabsContent value="analytics" class="space-y-4">
-                <BarChart :data="assignmentsStore.assignment" index="title" :categories="['', 'max_hours']" />
+                <BarChart :data="chartData" index="title" :categories="chartCategories" />
+                <DonutChart index="title" :category="'difficulty'" :data="assignmentsStore.assignment"/>
               </TabsContent>
             </Tabs>
           </div>

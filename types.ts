@@ -62,3 +62,13 @@ export interface Course {
     name:     string;
     class_id: string;
 }
+
+export interface StudentsPerformanceResponse {
+    data:       StudentsPerformance[];
+    pagination: Pagination;
+}
+
+export interface StudentsPerformance {
+    avg_student_hours:      string;
+    avg_student_difficulty: string;
+}
